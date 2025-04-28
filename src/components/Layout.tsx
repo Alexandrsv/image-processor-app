@@ -1,7 +1,7 @@
 // src/components/Layout.tsx
 import React from "react";
 import { Sidebar } from "./Sidebar.tsx";
-import { moduleRegistry } from "@/lib/moduleRegistry.ts";
+import { ModuleRegistry } from "@/lib/moduleRegistry.ts";
 import { ThemeToggle } from "./ThemeToggle.tsx";
 import { Toaster } from "@/components/ui/sonner.tsx"; // Импортируем переключатель темы
 
@@ -18,7 +18,7 @@ export function Layout({ children }: LayoutProps) {
           <h2 className="text-lg font-semibold">Обработка</h2>
           <ThemeToggle /> {/* Переключатель темы в сайдбаре */}
         </div>
-        <Sidebar modules={moduleRegistry} />
+        <Sidebar modules={ModuleRegistry} />
         {/* Можно добавить сюда глобальные настройки или другую информацию */}
       </aside>
       <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">

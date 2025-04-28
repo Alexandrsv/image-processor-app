@@ -16,7 +16,7 @@ export interface ProcessingModule {
 // Создаем массив (или объект) с зарегистрированными модулями
 // Каждый модуль должен экспортировать свою конфигурацию (как squircleConfig)
 // и свой основной компонент View (как SquircleView)
-export const moduleRegistry: ProcessingModule[] = [
+export const ModuleRegistry: ProcessingModule[] = [
   {
     id: squircleConfig.id,
     name: squircleConfig.name,
@@ -35,10 +35,10 @@ export const moduleRegistry: ProcessingModule[] = [
 
 // Функция для получения модуля по ID (может пригодиться)
 export const getModuleById = (id: string): ProcessingModule | undefined => {
-  return moduleRegistry.find((module) => module.id === id);
+  return ModuleRegistry.find((module) => module.id === id);
 };
 
 // Функция для получения модуля по Path (может пригодиться)
 export const getModuleByPath = (path: string): ProcessingModule | undefined => {
-  return moduleRegistry.find((module) => module.path === path);
+  return ModuleRegistry.find((module) => module.path === path);
 };
