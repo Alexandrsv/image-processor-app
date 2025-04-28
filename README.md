@@ -4,6 +4,10 @@ image-processor-app Vite + React + Tailwind
 A **plugin-style image playground** that runs 100 % in the browser.  
 Ship it to GitHub Pages (workflow included) and let anyone test image-processing ideas without local installs.
 
+[https://alexandrsv.github.io/image-processor-app/
+](https://alexandrsv.github.io/image-processor-app/)
+
+
 | Feature | What it gives you |
 |---------|------------------|
 | **Pure client-side** | Drag-and-drop images, zero server / CORS pain. |
@@ -20,7 +24,7 @@ Ship it to GitHub Pages (workflow included) and let anyone test image-processing
 
 | Demo | Link |
 |------|------|
-| Squircle Playground | **<https://alexandrsv.github.io/squircle>** |
+| Squircle Playground | **<https://alexandrsv.github.io/image-processor-app/squircle>** |
 
 ### What’s a squircle 🤔?
 
@@ -128,6 +132,7 @@ export default {
 * **Hackathons / R&D** — prototype multiple effects in one repo.
 * **Teaching** — each folder is a self-contained Canvas/WebGL example.
 * **Design tokens** — preview radii, palettes on real images.
+* **Vibe coding**
 
 ---
 
