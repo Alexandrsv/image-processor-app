@@ -5,7 +5,7 @@ import { Separator } from "@/components/ui/separator";
 import { SquircleControls } from "./components/SquircleControls";
 import { toast } from "sonner";
 import { drawSquircleImageOnCanvas } from "@/lib/canvasUtils"; // <--- Импортируем нашу утилиту
-import { Download, Trash2 } from "lucide-react"; // Иконки для кнопок
+import { Download, DownloadCloud, Trash, Trash2, Upload } from "lucide-react"; // Иконки для кнопок
 
 interface ImageState {
   id: string;
@@ -110,6 +110,26 @@ export function SquircleView() {
     });
   }, [images, cornerRadius, smoothing]); // Зависимости useEffect
 
+  const saveCanvas = (canvas: HTMLCanvasElement, fileName: string) => {
+    const dataUrl = canvas.toDataURL("image/png");
+    const link = document.createElement("a");
+    link.href = dataUrl;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleSaveAll = () => {
+    images.forEach((img) => {
+      const canvas = canvasRefs.current.get(img.id);
+      if (!canvas) return;
+      const base = img.name.substring(0, img.name.lastIndexOf(".")) || img.name;
+      saveCanvas(canvas, `${base}-squircle.png`);
+    });
+    toast.success(`Сохранены все изображения (${images.length})`);
+  };
+
   // Перерисовываем при изменении параметров
   useEffect(() => {
     redrawAllCanvases();
@@ -118,38 +138,18 @@ export function SquircleView() {
   // Функция для сохранения изображения с canvas
   const handleSaveImage = (id: string) => {
     const canvas = canvasRefs.current.get(id);
-    const image = images.find((img) => img.id === id);
+    const image = images.find((i) => i.id === id);
+    if (!canvas || !image) return;
 
-    if (canvas && image) {
-      try {
-        // Получаем Data URL в формате PNG (поддерживает прозрачность)
-        const dataUrl = canvas.toDataURL("image/png");
+    const base =
+      image.name.substring(0, image.name.lastIndexOf(".")) || image.name;
+    saveCanvas(canvas, `${base}-squircle.png`);
+    toast.success(`Сохранено: ${base}-squircle.png`);
+  };
 
-        // Создаем временную ссылку для скачивания
-        const link = document.createElement("a");
-        link.href = dataUrl;
-        // Формируем имя файла
-        const baseName =
-          image.name.substring(0, image.name.lastIndexOf(".")) || image.name;
-        link.download = `${baseName}-squircle.png`; // Добавляем суффикс
-
-        // Имитируем клик для скачивания
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-
-        toast.success(`Изображение "${link.download}" сохранено.`);
-      } catch (error) {
-        console.error("Failed to save canvas:", error);
-        toast.error("Ошибка сохранения", {
-          description: "Не удалось сохранить изображение.",
-        });
-      }
-    } else {
-      toast.error("Ошибка сохранения", {
-        description: "Не удалось найти canvas или данные изображения.",
-      });
-    }
+  const removeAll = () => {
+    setImages([]);
+    toast.info("Все изображения удалены");
   };
 
   return (
@@ -165,7 +165,7 @@ export function SquircleView() {
         style={{ display: "none" }}
       />
 
-      <div className="mb-6 flex flex-col  gap-4 items-start">
+      <div className="mb-6 flex flex-wrap gap-4 items-start">
         <div className="flex-grow w-full">
           <SquircleControls
             cornerRadius={cornerRadius}
@@ -174,7 +174,30 @@ export function SquircleView() {
             setSmoothing={setSmoothing}
           />
         </div>
-        <Button onClick={triggerFileInput}>Загрузить изображения</Button>
+        <Button onClick={triggerFileInput}>
+          <Upload />
+          Загрузить изображения
+        </Button>
+        {images.length > 1 && (
+          <Button
+            variant="secondary"
+            onClick={handleSaveAll}
+            className="flex items-center gap-2"
+          >
+            <DownloadCloud size={18} />
+            Сохранить&nbsp;все
+          </Button>
+        )}
+        {images.length > 0 && (
+          <Button
+            variant="destructive"
+            onClick={removeAll}
+            className="flex items-center gap-2"
+          >
+            <Trash size={18} />
+            Удалить&nbsp;все
+          </Button>
+        )}
       </div>
 
       <Separator className="my-8" />
