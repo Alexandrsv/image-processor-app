@@ -88,67 +88,45 @@ export async function drawSquircleImageOnCanvas(
   imageSrc: string,
   cornerRadius: number,
   cornerSmoothing: number,
-  displayWidth: number = 300, // Размер canvas по умолчанию
-  displayHeight: number = 300,
+  /** Upper bound for either side of the bitmap (defaults to 4096px). */
+  maxSize = 4096,
 ): Promise<void> {
   if (!canvas) return;
+
+  const img = new Image();
+  img.src = imageSrc;
+
+  await new Promise((resolve, reject) => {
+    img.onload = resolve;
+    img.onerror = reject;
+  });
+
+  // 1️⃣  Define final bitmap dimensions — keep aspect ratio, cap by maxSize for memory‑safety.
+  const scale = Math.min(
+    1,
+    maxSize / Math.max(img.naturalWidth, img.naturalHeight),
+  );
+  const bmpW = Math.round(img.naturalWidth * scale);
+  const bmpH = Math.round(img.naturalHeight * scale);
+
+  // 2️⃣  Resize canvas *physical* pixels for DPR; set CSS size for page layout.
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = bmpW * dpr;
+  canvas.height = bmpH * dpr;
+  canvas.style.width = `${bmpW}px`;
+  canvas.style.height = `${bmpH}px`;
 
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
 
-  // Устанавливаем реальный размер canvas (важно для четкости)
-  canvas.width = displayWidth * window.devicePixelRatio;
-  canvas.height = displayHeight * window.devicePixelRatio;
-  canvas.style.width = `${displayWidth}px`;
-  canvas.style.height = `${displayHeight}px`;
+  ctx.save();
+  ctx.scale(dpr, dpr); // map user‑space to CSS pixels
 
-  // Масштабируем контекст для учета devicePixelRatio
-  ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
-
-  // Очищаем canvas перед рисованием
-  ctx.clearRect(0, 0, displayWidth, displayHeight);
-
-  // Загружаем изображение для получения его размеров
-  const img = new Image();
-  await new Promise((resolve, reject) => {
-    img.onload = resolve;
-    img.onerror = reject;
-    img.src = imageSrc;
-  });
-
-  // Создаем путь squircle
-  createSquirclePath(
-    ctx,
-    displayWidth,
-    displayHeight,
-    cornerRadius,
-    cornerSmoothing,
-  );
-
-  // Устанавливаем этот путь как маску (clipping region)
-  ctx.save(); // Сохраняем текущее состояние контекста
+  // 3️⃣  Build squircle clipping path that exactly matches *current* rectangle.
+  createSquirclePath(ctx, bmpW, bmpH, cornerRadius, cornerSmoothing);
   ctx.clip();
 
-  // Рассчитываем размеры для рисования изображения с сохранением пропорций (object-contain)
-  const imgAspectRatio = img.naturalWidth / img.naturalHeight;
-  const canvasAspectRatio = displayWidth / displayHeight;
-  let drawWidth = displayWidth;
-  let drawHeight = displayHeight;
-  let dx = 0;
-  let dy = 0;
-
-  if (imgAspectRatio > canvasAspectRatio) {
-    // Изображение шире canvas
-    drawHeight = displayWidth / imgAspectRatio;
-    dy = (displayHeight - drawHeight) / 2; // Центрируем по вертикали
-  } else {
-    // Изображение выше canvas или такое же по пропорциям
-    drawWidth = displayHeight * imgAspectRatio;
-    dx = (displayWidth - drawWidth) / 2; // Центрируем по горизонтали
-  }
-
-  // Рисуем изображение внутри маски
-  ctx.drawImage(img, dx, dy, drawWidth, drawHeight);
-
-  ctx.restore(); // Восстанавливаем контекст (убираем маску для будущих операций, если они будут)
+  // 4️⃣  Draw the full‑size image — no squeezing / letter‑boxing.
+  ctx.drawImage(img, 0, 0, bmpW, bmpH);
+  ctx.restore();
 }
