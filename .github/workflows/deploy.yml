@@ -1,0 +1,48 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: ["master"]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ⬇️ Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: "latest"
+
+      - name: 📦 Install dependencies with Bun
+        run: bun install --frozen-lockfile
+
+      - name: 🏗️ Build with Vite (via Bun)
+        env:
+          BASE_PATH: "/${{ github.event.repository.name }}/"
+        run: bun run build
+
+      - name: ☁️ Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+      - name: 🚀 Deploy
+        id: deploy
+        uses: actions/deploy-pages@v4
+
+      - name: 🔗 Deployment URL
+        run: |
+          echo "🚀 Site: ${{ steps.deploy.outputs.page_url }}"
