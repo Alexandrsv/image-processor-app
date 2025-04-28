@@ -34,6 +34,11 @@ jobs:
           BASE_PATH: "/${{ github.event.repository.name }}/"
         run: bun run build
 
+      # Копируем index.html → 404.html,
+      # чтобы GitHub Pages отдавал SPA-бандл на deep-link URL.
+      - name: 🔄 Add SPA fallback
+        run: cp dist/index.html dist/404.html
+
       - name: ☁️ Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
@@ -43,6 +48,6 @@ jobs:
         id: deploy
         uses: actions/deploy-pages@v4
 
-      - name: 🔗 Deployment URL
+      - name: 🔗 Show deployment URL
         run: |
           echo "🚀 Site: ${{ steps.deploy.outputs.page_url }}"
