@@ -24,12 +24,29 @@ export function SquircleControls({
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-2">
-          <Label htmlFor="cornerRadius">Радиус угла ({cornerRadius}px)</Label>
+          <Label htmlFor="cornerRadius">
+            Радиус угла в пикселях&nbsp;
+            {cornerRadius >= 1 ? `(${cornerRadius}px)` : ""}
+          </Label>
+          <Slider
+            id="cornerRadius"
+            min={2}
+            max={500} // Настройте максимальный радиус
+            step={1}
+            value={[cornerRadius]}
+            onValueChange={(value) => setCornerRadius(value[0])}
+          />
+        </div>
+        <div>
+          <Label htmlFor="cornerRadius">
+            Радиус угла в процентах&nbsp;
+            {cornerRadius <= 1 ? `(${Math.round(cornerRadius * 100)}%)` : ""}
+          </Label>
           <Slider
             id="cornerRadius"
             min={0}
-            max={200} // Настройте максимальный радиус
-            step={1}
+            max={1} // Настройте максимальный радиус
+            step={0.01}
             value={[cornerRadius]}
             onValueChange={(value) => setCornerRadius(value[0])}
           />

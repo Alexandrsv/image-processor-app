@@ -165,9 +165,8 @@ export function SquircleView() {
         style={{ display: "none" }}
       />
 
-      <div className="mb-6 flex flex-col md:flex-row gap-4 items-start">
-        <Button onClick={triggerFileInput}>Загрузить изображения</Button>
-        <div className="flex-grow">
+      <div className="mb-6 flex flex-col  gap-4 items-start">
+        <div className="flex-grow w-full">
           <SquircleControls
             cornerRadius={cornerRadius}
             setCornerRadius={setCornerRadius}
@@ -175,6 +174,7 @@ export function SquircleView() {
             setSmoothing={setSmoothing}
           />
         </div>
+        <Button onClick={triggerFileInput}>Загрузить изображения</Button>
       </div>
 
       <Separator className="my-8" />

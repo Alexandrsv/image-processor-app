@@ -15,80 +15,50 @@ export function createSquirclePath(
   height: number,
   cornerRadius: number,
   cornerSmoothing: number,
-): void {
-  // Ограничиваем радиус максимальным возможным значением
-  let radius = Math.min(cornerRadius, width / 2, height / 2);
-  if (radius < 0) radius = 0;
+) {
+  // 💡  Convert *ratio* radii to pixels.
+  const minSide = Math.min(width, height);
+  let radiusPx = cornerRadius <= 1 ? cornerRadius * minSide : cornerRadius;
 
-  const smoothing = Math.max(0, Math.min(1, cornerSmoothing)); // Убедимся, что сглаживание в диапазоне [0, 1]
+  // Clamp so it never exceeds half the respective sides.
+  radiusPx = Math.min(radiusPx, width / 2, height / 2);
+  if (radiusPx < 0) radiusPx = 0;
 
-  // Расстояние до контрольных точек Безье от угла
-  const controlPointDist = radius * (1 - smoothing);
+  const smoothing = Math.max(0, Math.min(1, cornerSmoothing));
+  const cp = radiusPx * (1 - smoothing); // ctrl‑point distance
 
   ctx.beginPath();
-
-  // Верхний левый угол
-  ctx.moveTo(0, radius);
-  ctx.bezierCurveTo(0, controlPointDist, controlPointDist, 0, radius, 0);
-
-  // Верхняя грань
-  ctx.lineTo(width - radius, 0);
-
-  // Верхний правый угол
-  ctx.bezierCurveTo(
-    width - controlPointDist,
-    0,
-    width,
-    controlPointDist,
-    width,
-    radius,
-  );
-
-  // Правая грань
-  ctx.lineTo(width, height - radius);
-
-  // Нижний правый угол
+  ctx.moveTo(radiusPx, 0);
+  // Top edge → Top‑right corner
+  ctx.lineTo(width - radiusPx, 0);
+  ctx.bezierCurveTo(width - cp, 0, width, cp, width, radiusPx);
+  // Right edge → Bottom‑right
+  ctx.lineTo(width, height - radiusPx);
   ctx.bezierCurveTo(
     width,
-    height - controlPointDist,
-    width - controlPointDist,
+    height - cp,
+    width - cp,
     height,
-    width - radius,
+    width - radiusPx,
     height,
   );
-
-  // Нижняя грань
-  ctx.lineTo(radius, height);
-
-  // Нижний левый угол
-  ctx.bezierCurveTo(
-    controlPointDist,
-    height,
-    0,
-    height - controlPointDist,
-    0,
-    height - radius,
-  );
-
-  // Левая грань и закрытие пути
-  ctx.closePath(); // Соединяет с начальной точкой ctx.moveTo(0, radius)
+  // Bottom edge → Bottom‑left
+  ctx.lineTo(radiusPx, height);
+  ctx.bezierCurveTo(cp, height, 0, height - cp, 0, height - radiusPx);
+  // Left edge → Top‑left + close
+  ctx.lineTo(0, radiusPx);
+  ctx.bezierCurveTo(0, cp, cp, 0, radiusPx, 0);
+  ctx.closePath();
 }
-
 /**
- * Рисует изображение на canvas с применением маски squircle.
- * @param canvas - Элемент Canvas для рисования.
- * @param imageSrc - Источник изображения (Data URL).
- * @param cornerRadius - Радиус скругления.
- * @param cornerSmoothing - Сглаживание углов.
- * @param displayWidth - Желаемая ширина отображения на canvas.
- * @param displayHeight - Желаемая высота отображения на canvas.
+ * Draw `imageSrc` into `canvas` masked by a squircle.
+ * `cornerRadius` follows the *same* pixel/ratio semantics described above.
  */
 export async function drawSquircleImageOnCanvas(
   canvas: HTMLCanvasElement | null,
   imageSrc: string,
   cornerRadius: number,
   cornerSmoothing: number,
-  /** Upper bound for either side of the bitmap (defaults to 4096px). */
   maxSize = 4096,
 ): Promise<void> {
   if (!canvas) return;
@@ -96,12 +66,12 @@ export async function drawSquircleImageOnCanvas(
   const img = new Image();
   img.src = imageSrc;
 
-  await new Promise((resolve, reject) => {
-    img.onload = resolve;
-    img.onerror = reject;
+  await new Promise<void>((res, rej) => {
+    img.onload = () => res();
+    img.onerror = () => rej(new Error("Image load failure"));
   });
 
-  // 1️⃣  Define final bitmap dimensions — keep aspect ratio, cap by maxSize for memory‑safety.
+  // ↳ Maintain aspect‑ratio, cap side length.
   const scale = Math.min(
     1,
     maxSize / Math.max(img.naturalWidth, img.naturalHeight),
@@ -109,7 +79,6 @@ export async function drawSquircleImageOnCanvas(
   const bmpW = Math.round(img.naturalWidth * scale);
   const bmpH = Math.round(img.naturalHeight * scale);
 
-  // 2️⃣  Resize canvas *physical* pixels for DPR; set CSS size for page layout.
   const dpr = window.devicePixelRatio || 1;
   canvas.width = bmpW * dpr;
   canvas.height = bmpH * dpr;
@@ -120,13 +89,9 @@ export async function drawSquircleImageOnCanvas(
   if (!ctx) return;
 
   ctx.save();
-  ctx.scale(dpr, dpr); // map user‑space to CSS pixels
-
-  // 3️⃣  Build squircle clipping path that exactly matches *current* rectangle.
+  ctx.scale(dpr, dpr);
   createSquirclePath(ctx, bmpW, bmpH, cornerRadius, cornerSmoothing);
   ctx.clip();
-
-  // 4️⃣  Draw the full‑size image — no squeezing / letter‑boxing.
   ctx.drawImage(img, 0, 0, bmpW, bmpH);
   ctx.restore();
 }
