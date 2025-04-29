@@ -1,119 +1,117 @@
-# 🖼️ Image Processor App 
-image-processor-app Vite + React + Tailwind
+## **Image Processor App**
+🇷🇺 Russian README: [README.md](README.md)  
+🇬🇧 English README: [README_EN.md](README_EN.md)  
 
-A **plugin-style image playground** that runs 100 % in the browser.  
-Ship it to GitHub Pages (workflow included) and let anyone test image-processing ideas without local installs.
+`Image Processor App` — это браузерная песочница на **Vite + React + Tailwind**, позволяющая тестировать и демонстрировать идеи по обработке изображений **без установки программ и серверов**. Форкните репозиторий, задеплойте на GitHub Pages и делитесь одной ссылкой, где пользователи смогут перетащить файл, настроить параметры и скачать результат.  
 
-| Feature | What it gives you |
-|---------|------------------|
-| **Pure client-side** | Drag-and-drop images, zero server / CORS pain. |
-| **Module registry** | Each effect lives in its own folder and auto-registers. |
-| **Dark / Light theme** | `next-themes` toggle + Tailwind `dark:` utilities. |
-| **Bun-first toolchain** | Blazing-fast install/build, still npm-compatible. |
-| **1-Click deploy** | GitHub Actions → GitHub Pages. |
+
+
+| Возможность               | Что даёт                                                     |
+|---------------------------|--------------------------------------------------------------|
+| **Браузерный**            | Приложение работает без бэка                                 |
+| **Реестр модулей**        | Каждый эффект — отдельная папка, авто-регистрация и роутинг. |
+| **Тёмная / светлая тема** | Переключатель `next-themes` + `dark:`-утилиты Tailwind.      |
+
+🔗 **Демо:** <https://alexandrsv.github.io/image-processor-app/>
 
 ---
 
-## ✨ Built-in module — **Squircle mask**
+### ✨ Модель **Squircle** (маска «плавный прямоугольник») онлайн бесплатно
 
-> **Need rounded-rectangle avatars, stickers or UI previews? Start here.**
+Нужны аватары, стикеры или UI-превью с мягкими скруглёнными углами в стиле iOS? Откройте Squircle-песочницу:
 
-| Demo | Link |
-|------|------|
-| Squircle Playground | **<https://alexandrsv.github.io/squircle>** |
+<https://alexandrsv.github.io/image-processor-app/squircle>
 
-### What’s a squircle 🤔?
+#### Что такое squircle?
+**Squircle** («square + circle») — это форма, где прямые стороны плавно переходят в кривые с помощью Bézier-кривой, без резкого скачка `border-radius`. Популяризирована иконками iOS; выглядит мягче и **уменьшает алиасинг** на маленьких размерах.
 
-A **squircle** (“square + circle”) is a smooth rounded-rectangle whose
-corner curvature gradually changes instead of the abrupt switch you get with
-plain `border-radius`. Popularised by Apple’s iOS app icons, squircles feel
-softer, more organic and **reduce visual aliasing** at small sizes.
+#### Почему стоит использовать?
+* **Смотрится лучше, чем жёсткий `border-radius`** — нет «плоской» кромки перед углом.
+* **Без рваных пикселей** — Bézier-сглаживание даёт идеальные углы на retina-экранах.
+* **Без лишней разметки** — всё в canvas-маске; никакого вложенного `<div>` или SVG-клипов.
+* **Любой формат и разрешение** — фотографии, PNG с альфой, UI-мокапы.
+* **Мгновенное скачивание** — один клик и PNG с прозрачностью у вас.
 
-**Why use it?**
-
-* **Looks better than hard `border-radius`** — no “flat” edge before the curve.
-* **No jagged edges** — the Bézier curve produces crisp antialiased corners,
-  especially on high-DPI screens.
-* **Zero extra markup** — it’s a canvas mask, not nested divs/SVG clips.
-* **Any image & resolution** — photographs, UI mock-ups, transparent PNGs…
-* **Instant download** — one click to save the processed PNG (with alpha).
-
-### Key features
-
-* **Preserves original resolution & aspect ratio** — your 4 K photo will stay 4 K.  
-* **Corner radius in px *or* %** (`0.25` = 25 % of the shorter side).  
-* **Adjustable smoothing** for ultra-sharp or ultra-round vibes.  
-* **PNG export with transparency** — ready for avatars, Telegram/Discord
-  stickers, marketing shots, etc.
+#### Ключевые возможности
+* **Сохраняет исходное разрешение и пропорции** — 4 K останется 4 K.
+* **Радиус в px или %** (`0.25` = 25 % короткой стороны).
+* **Настраиваемая плавность** — от острого до супер-круглого.
+* **Экспорт PNG с альфой** — готово для аватаров, стикеров, маркетинга и др.
 
 <details>
-<summary>Module layout</summary>
+<summary>Структура модуля</summary>
 
 ```
 src/modules/squircle/
-├── SquircleView.tsx   # React UI: upload → tweak radius/smoothing → save PNG
-├── config.ts          # Metadata for auto-registry
-└── (math)             # Squircle Bézier math lives in src/lib/canvasUtils.ts
+├── SquircleView.tsx   # UI: загрузка → радиус/плавность → PNG
+├── config.ts          # Метаданные для авто-регистрации
+└── (math)             # Bézier-утилы в src/lib/canvasUtils.ts
 ```
 </details>
 
 ---
 
-## 🚀 Quick start
+### 🚀 Быстрый старт
+
+<details>
+<summary>Осторожно</summary>
+
+```
+При написании был использован vibe coding
+```
+</details>
 
 ```bash
 git clone https://github.com/<you>/image-processor-app.git
 cd image-processor-app
 
-bun install      # or npm ci / bun i
-bun run dev      # -> http://localhost:5173
+bun install      # или npm ci / bun i
+bun run dev      # → http://localhost:5173
 ```
 
-Production build & preview:
+Сборка и локальный предпросмотр:
 
 ```bash
 bun run build
 bun run preview
 ```
 
-Push to **main** → GitHub Pages auto-deploys (see `.github/workflows/deploy.yml`).
+Пуш в **master** → GitHub Pages деплоит автоматически (`.github/workflows/deploy.yml`).
 
 ---
 
-## 📦 Repository layout
+### 📦 Cтруктура репозитория
 
 ```
 .
 ├── src/
-│   ├── modules/           # <── Drop your image-processing modules here
-│   │   └── squircle/      # Example “smooth rounded rectangle” mask
-│   ├── components/        # Shared UI (Layout, ThemeToggle, shadcn/ui wrappers)
-│   ├── lib/               # Canvas & helper utilities
-│   └── App.tsx            # Router + ThemeProvider
-├── public/                # Static assets
-├── tailwind.config.ts     # Tailwind “darkMode: class”
-├── vite.config.ts         # BASE_PATH injection for GitHub Pages
+│   ├── modules/           # <— Ваши модули обработки изображений
+│   │   └── squircle/      # Пример маски «плавный прямоугольник»
+│   ├── components/        # Общие UI-компоненты
+│   ├── lib/               # Canvas-утилиты
+│   └── App.tsx            # Роутер + ThemeProvider
+├── public/                # Статика
+├── tailwind.config.ts     # Tailwind «darkMode: class»
+├── vite.config.ts         # BASE_PATH для GitHub Pages
 └── ...
 ```
 
 ---
 
-## ➕ Write your own module
+### ➕ Cоздание собственного модуля
 
-1. **Scaffold** `src/modules/<id>/` with `View.tsx` and `config.ts`.
-2. `config.ts` exports `{ id, title, path, component, icon }`.
-3. Build UI in `View.tsx`, import shared buttons/toasts.
-4. Restart dev server — the module auto-appears in sidebar & routing.
-
-Example `config.ts`:
+1. Создайте `src/modules/<id>/` с `View.tsx` и `config.ts`.
+2. В `config.ts` экспортируйте `{ id, title, path, component, icon }`.
+3. Перезапустите dev-сервер — модуль появится в сайдбаре и маршрутах.
 
 ```ts
+// src/modules/myfilter/config.ts
 import { MyFilterView } from "./MyFilterView";
 import { ImageIcon } from "lucide-react";
 
 export default {
   id: "myfilter",
-  title: "My cool filter",
+  title: "Мой фильтр",
   path: "/myfilter",
   component: MyFilterView,
   icon: ImageIcon,
@@ -122,13 +120,14 @@ export default {
 
 ---
 
-## 🙋‍♂️ Why use this repo?
+### 🙋‍♂️ Зачем пользоваться этим репо?
 
-* **Product demos** — share a static URL instead of screenshots.
-* **Hackathons / R&D** — prototype multiple effects in one repo.
-* **Teaching** — each folder is a self-contained Canvas/WebGL example.
-* **Design tokens** — preview radii, palettes on real images.
+* **Демо-продуктов** — живая ссылка вместо скриншотов.
+* **Хакатоны / R&D** — быстро прототипируйте несколько эффектов в одном месте.
+* **Обучение** — каждая папка — самодостаточный пример Canvas/WebGL.
+* **Design tokens** — проверка радиусов и палитр на реальных изображениях.
+* **Vibe coding** — Можешь добавлять модули при помощи нейронки, но убедись, что не пушишь хлам
 
 ---
 
-Enjoy & contribute!
+*Приятного пользования! Буду рад вашим pull-request.*
