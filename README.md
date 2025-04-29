@@ -4,6 +4,13 @@
 
 `Image Processor App` — это браузерная песочница на **Vite + React + Tailwind**, позволяющая тестировать и демонстрировать идеи по обработке изображений **без установки программ и серверов**. Форкните репозиторий, задеплойте на GitHub Pages и делитесь одной ссылкой, где пользователи смогут перетащить файл, настроить параметры и скачать результат.  
 
+| Feature | What it gives you |
+|---------|------------------|
+| **Pure client-side** | Drag-and-drop images, zero server / CORS pain. |
+| **Module registry** | Each effect lives in its own folder and auto-registers. |
+| **Dark / Light theme** | `next-themes` toggle + Tailwind `dark:` utilities. |
+| **Bun-first toolchain** | Blazing-fast install/build, still npm-compatible. |
+| **1-Click deploy** | GitHub Actions → GitHub Pages. |
 
 
 | Возможность               | Что даёт                                                     |
@@ -14,7 +21,9 @@
 
 🔗 **Демо:** <https://alexandrsv.github.io/image-processor-app/>
 
----
+| Demo | Link |
+|------|------|
+| Squircle Playground | **<https://alexandrsv.github.io/squircle>** |
 
 ### ✨ Модель **Squircle** (маска «плавный прямоугольник») онлайн бесплатно
 
@@ -122,11 +131,10 @@ export default {
 
 ### 🙋‍♂️ Зачем пользоваться этим репо?
 
-* **Демо-продуктов** — живая ссылка вместо скриншотов.
-* **Хакатоны / R&D** — быстро прототипируйте несколько эффектов в одном месте.
-* **Обучение** — каждая папка — самодостаточный пример Canvas/WebGL.
-* **Design tokens** — проверка радиусов и палитр на реальных изображениях.
-* **Vibe coding** — Можешь добавлять модули при помощи нейронки, но убедись, что не пушишь хлам
+* **Product demos** — share a static URL instead of screenshots.
+* **Hackathons / R&D** — prototype multiple effects in one repo.
+* **Teaching** — each folder is a self-contained Canvas/WebGL example.
+* **Design tokens** — preview radii, palettes on real images.
 
 ---
 
